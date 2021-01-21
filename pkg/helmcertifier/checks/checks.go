@@ -19,6 +19,8 @@
 package checks
 
 import (
+	"strings"
+
 	"github.com/pkg/errors"
 )
 
@@ -62,7 +64,21 @@ func HasReadme(uri string) (Result, error) {
 }
 
 func ContainsTest(uri string) (Result, error) {
-	return notImplemented()
+	c, err := loadChartFromURI(uri)
+	if err != nil {
+		return Result{}, err
+	}
+
+	containTest := false
+	for _, f := range c.Templates {
+		if strings.HasPrefix(f.Name, "templates/tests/") {
+			containTest = true
+			break
+		}
+	}
+
+	return Result{Ok: containTest}, nil
+
 }
 
 func ReadmeContainsValuesSchema(uri string) (Result, error) {

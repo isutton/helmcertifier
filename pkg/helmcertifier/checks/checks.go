@@ -27,6 +27,9 @@ import (
 const APIVersion2 = "v2"
 const NotHelm3Reason = "API version is not V2 used in Helm 3"
 const Helm3Reason = "API version is V2 used in Helm 3"
+const TestTemplatePrefix = "templates/tests/"
+const ChartTestFilesExists = "Chart test files exists"
+const ChartTestFilesDoesNotExists = "Chart test files does not exists"
 
 func notImplemented() (Result, error) {
 	return Result{Ok: false}, errors.New("not implemented")
@@ -70,14 +73,16 @@ func ContainsTest(uri string) (Result, error) {
 	}
 
 	containTest := false
+	reason := ChartTestFilesDoesNotExists
 	for _, f := range c.Templates {
-		if strings.HasPrefix(f.Name, "templates/tests/") {
+		if strings.HasPrefix(f.Name, TestTemplatePrefix) && strings.HasSuffix(f.Name, ".yaml") {
 			containTest = true
+			reason = ChartTestFilesExists
 			break
 		}
 	}
 
-	return Result{Ok: containTest}, nil
+	return Result{Ok: containTest, Reason: reason}, nil
 
 }
 

@@ -105,7 +105,7 @@ func TestContainsTest(t *testing.T) {
 	}
 
 	positiveTestCases := []testCase{
-		{description: "tarball contains at least one test", uri: "testchart-0.1.0.tgz"},
+		{description: "tarball contains at least one test", uri: "chart-0.1.0-v3.valid.tgz"},
 	}
 
 	for _, tc := range positiveTestCases {
@@ -113,17 +113,22 @@ func TestContainsTest(t *testing.T) {
 			r, err := ContainsTest(tc.uri)
 			require.NoError(t, err)
 			require.NotNil(t, r)
-			require.Equal(t, true, r.Ok)
+			require.True(t, r.Ok)
+			require.Equal(t, ChartTestFilesExists, r.Reason)
 		})
 	}
 
-	negativeTestCases := []testCase{}
+	negativeTestCases := []testCase{
+		{description: "tarball contains at least one test", uri: "chart-0.1.0-v3.valid.notest.tgz"},
+	}
 
 	for _, tc := range negativeTestCases {
 		t.Run(tc.description, func(t *testing.T) {
 			r, err := ContainsTest(tc.uri)
-			require.Error(t, err)
-			require.Nil(t, r)
+			require.NoError(t, err)
+			require.NotNil(t, r)
+			require.False(t, r.Ok)
+			require.Equal(t, ChartTestFilesDoesNotExists, r.Reason)
 		})
 	}
 }

@@ -114,7 +114,7 @@ func TestContainsTest(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, r)
 			require.True(t, r.Ok)
-			require.Equal(t, ChartTestFilesExists, r.Reason)
+			require.Equal(t, ChartTestFilesExist, r.Reason)
 		})
 	}
 
@@ -128,7 +128,7 @@ func TestContainsTest(t *testing.T) {
 			require.NoError(t, err)
 			require.NotNil(t, r)
 			require.False(t, r.Ok)
-			require.Equal(t, ChartTestFilesDoesNotExists, r.Reason)
+			require.Equal(t, ChartTestFilesDoesNotExist, r.Reason)
 		})
 	}
 }

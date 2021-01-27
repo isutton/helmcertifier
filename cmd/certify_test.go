@@ -20,8 +20,11 @@ package cmd
 
 import (
 	"bytes"
-	"github.com/stretchr/testify/require"
 	"testing"
+
+	"github.com/stretchr/testify/require"
+
+	"helmcertifier/pkg/helmcertifier/checks"
 )
 
 func TestCertify(t *testing.T) {
@@ -49,15 +52,18 @@ func TestCertify(t *testing.T) {
 			require.Error(t, cmd.Execute())
 		})
 
-		t.Run("Should succeed when flag -u and values are given", func(t *testing.T) {
+		t.Run("Should fail when flag -u and values are given but resource does not exist", func(t *testing.T) {
 			cmd := NewCertifyCmd()
 			outBuf := bytes.NewBufferString("")
 			cmd.SetOut(outBuf)
 			errBuf := bytes.NewBufferString("")
 			cmd.SetErr(errBuf)
 
-			cmd.SetArgs([]string{"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.valid.tgz"})
-			require.NoError(t, cmd.Execute())
+			cmd.SetArgs([]string{"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.non-existing.tgz"})
+
+			err := cmd.Execute()
+			require.Error(t, err)
+			require.True(t, checks.IsChartNotFound(err))
 		})
 
 		t.Run("Should fail when flag -o is given but check doesn't exist", func(t *testing.T) {
@@ -69,6 +75,19 @@ func TestCertify(t *testing.T) {
 
 			cmd.SetArgs([]string{"-u", "/tmp/chart.tgz", "-o"})
 			require.Error(t, cmd.Execute())
+		})
+
+		t.Run("Should succeed when flag -u and values are given", func(t *testing.T) {
+			cmd := NewCertifyCmd()
+			outBuf := bytes.NewBufferString("")
+			cmd.SetOut(outBuf)
+			errBuf := bytes.NewBufferString("")
+			cmd.SetErr(errBuf)
+
+			cmd.SetArgs([]string{"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.valid.tgz"})
+			require.NoError(t, cmd.Execute())
+			require.NotEmpty(t, outBuf.String())
+			require.Equal(t, "<CERTIFICATION OUTPUT>\n", outBuf.String())
 		})
 	})
 }

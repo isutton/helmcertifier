@@ -44,7 +44,15 @@ type certifier struct {
 }
 
 func (c *certifier) Certify(uri string) (Certificate, error) {
-	result := NewCertificateBuilder()
+
+	chrt, err := checks.LoadChartFromURI(uri)
+	if err != nil {
+		return nil, err
+	}
+
+	result := NewCertificateBuilder().
+		SetChartName(chrt.Name()).
+		SetChartVersion(chrt.AppVersion())
 
 	for _, name := range c.requiredChecks {
 		if checkFunc, ok := c.registry.Get(name); !ok {

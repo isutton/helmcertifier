@@ -18,10 +18,40 @@
 
 package helmcertifier
 
+type chartMetadata struct {
+	Name    string
+	Version string
+}
+
+type certificateMetadata struct {
+	ChartMetadata chartMetadata
+}
+
+func newCertificateMetadata(name, version string) *certificateMetadata {
+	return &certificateMetadata{
+		ChartMetadata: chartMetadata{
+			Name:    name,
+			Version: version,
+		},
+	}
+}
+
 type certificate struct {
-	Ok bool
+	CertificateMetadata *certificateMetadata
+	Ok                  bool
+}
+
+func newCertificate(name, version string, ok bool) Certificate {
+	return &certificate{
+		CertificateMetadata: newCertificateMetadata(name, version),
+		Ok:                  ok,
+	}
 }
 
 func (r *certificate) IsOk() bool {
 	return r.Ok
+}
+
+func (r *certificate) String() string {
+	return "<CERTIFICATION OUTPUT>"
 }

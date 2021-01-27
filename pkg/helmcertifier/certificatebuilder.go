@@ -19,16 +19,22 @@
 package helmcertifier
 
 import (
+	"errors"
+
 	"helmcertifier/pkg/helmcertifier/checks"
 )
 
 type CertificateBuilder interface {
+	SetChartName(name string) CertificateBuilder
+	SetChartVersion(version string) CertificateBuilder
 	AddResult(result checks.Result) CertificateBuilder
 	Build() (Certificate, error)
 }
 
 type certificateBuilder struct {
-	Results []checks.Result
+	ChartName    string
+	ChartVersion string
+	Results      []checks.Result
 }
 
 func NewCertificateBuilder() CertificateBuilder {
@@ -37,20 +43,38 @@ func NewCertificateBuilder() CertificateBuilder {
 	}
 }
 
+func (r *certificateBuilder) SetChartName(name string) CertificateBuilder {
+	r.ChartName = name
+	return r
+}
+
+func (r *certificateBuilder) SetChartVersion(version string) CertificateBuilder {
+	r.ChartVersion = version
+	return r
+}
+
 func (r *certificateBuilder) AddResult(result checks.Result) CertificateBuilder {
 	r.Results = append(r.Results, result)
 	return r
 }
 
 func (r *certificateBuilder) Build() (Certificate, error) {
-	res := &certificate{Ok: true}
+	if r.ChartName == "" {
+		return nil, errors.New("chart name must be set")
+	}
+
+	if r.ChartVersion == "" {
+		return nil, errors.New("chart version must be set")
+	}
+
+	ok := true
 
 	for _, cr := range r.Results {
 		if !cr.Ok {
-			res.Ok = false
+			ok = false
 			break
 		}
 	}
 
-	return res, nil
+	return newCertificate(r.ChartName, r.ChartVersion, ok), nil
 }

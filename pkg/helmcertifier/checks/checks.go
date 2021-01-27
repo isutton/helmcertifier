@@ -24,12 +24,16 @@ import (
 	"github.com/pkg/errors"
 )
 
-const APIVersion2 = "v2"
-const NotHelm3Reason = "API version is not V2 used in Helm 3"
-const Helm3Reason = "API version is V2 used in Helm 3"
-const TestTemplatePrefix = "templates/tests/"
-const ChartTestFilesExist = "Chart test files exist"
-const ChartTestFilesDoesNotExist = "Chart test files does not exist"
+const (
+	APIVersion2                 = "v2"
+	NotHelm3Reason              = "API version is not V2 used in Helm 3"
+	Helm3Reason                 = "API version is V2 used in Helm 3"
+	TestTemplatePrefix          = "templates/tests/"
+	ChartTestFilesExist         = "Chart test files exist"
+	ChartTestFilesDoesNotExist  = "Chart test files does not exist"
+	MinKuberVersionSpecified    = "Minimum Kubernetes version specified"
+	MinKuberVersionNotSpecified = "Minimum Kubernetes version not specified"
+)
 
 func notImplemented() (Result, error) {
 	return Result{Ok: false}, errors.New("not implemented")
@@ -102,7 +106,19 @@ func IsCommunityChart(uri string) (Result, error) {
 }
 
 func HasMinKubeVersion(uri string) (Result, error) {
-	return notImplemented()
+	c, err := loadChartFromURI(uri)
+	if err != nil {
+		return Result{}, err
+	}
+
+	r := Result{Reason: MinKuberVersionNotSpecified}
+
+	if c.Metadata.KubeVersion != "" {
+		r.Ok = true
+		r.Reason = MinKuberVersionSpecified
+	}
+
+	return r, nil
 }
 
 func NotContainsCRDs(uri string) (Result, error) {

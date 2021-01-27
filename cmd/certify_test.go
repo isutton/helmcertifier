@@ -74,7 +74,9 @@ func TestCertify(t *testing.T) {
 			cmd.SetErr(errBuf)
 
 			cmd.SetArgs([]string{"-u", "/tmp/chart.tgz", "-o"})
-			require.Error(t, cmd.Execute())
+			err := cmd.Execute()
+			require.Error(t, err)
+			require.False(t, checks.IsChartNotFound(err))
 		})
 
 		t.Run("Should succeed when flag -u and values are given", func(t *testing.T) {

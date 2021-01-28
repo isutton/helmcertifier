@@ -75,7 +75,7 @@ func HasReadme(uri string) (Result, error) {
 }
 
 func ContainsTest(uri string) (Result, error) {
-	c, err := loadChartFromURI(uri)
+	c, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}

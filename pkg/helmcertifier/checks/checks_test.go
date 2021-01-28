@@ -140,7 +140,7 @@ func TestHasMinKubeVersion(t *testing.T) {
 	}
 
 	positiveTestCases := []testCase{
-		{description: "minimum Kubernetes version specified", uri: "chart-0.1.0-v3.minkubeversion.tgz"},
+		{description: "minimum Kubernetes version specified", uri: "chart-0.1.0-v3.valid.tgz"},
 	}
 
 	for _, tc := range positiveTestCases {

@@ -26,7 +26,7 @@ import (
 //goland:noinspection GoUnusedGlobalVariable
 var (
 	// allChecks contains all available checks to be executed by the program.
-	allChecks []string = []string{"is-helm-package"}
+	allChecks []string = []string{"is-helm-v3"}
 	// chartUri contains the chart location as informed by the user; should accept anything that Helm understands as a Chart
 	// URI.
 	chartUri string

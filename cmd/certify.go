@@ -34,6 +34,8 @@ var (
 	onlyChecks []string
 	// exceptChecks are the checks that should not be performed.
 	exceptChecks []string
+	// outputFormat contains the output format the user has specified: default, yaml or json.
+	outputFormat string
 )
 
 func buildChecks(allChecks, onlyChecks, _ []string) []string {
@@ -67,7 +69,12 @@ func NewCertifyCmd() *cobra.Command {
 			if err != nil {
 				return err
 			}
-			cmd.Println(result)
+
+			if outputFormat == "json" {
+				cmd.Println("{}")
+			} else {
+				cmd.Println(result)
+			}
 
 			return nil
 		},
@@ -79,6 +86,8 @@ func NewCertifyCmd() *cobra.Command {
 	cmd.Flags().StringSliceVarP(&onlyChecks, "only", "o", nil, "only the informed checks will be performed")
 
 	cmd.Flags().StringSliceVarP(&exceptChecks, "except", "e", nil, "all available checks except those informed will be performed")
+
+	cmd.Flags().StringVarP(&outputFormat, "output", "f", "", "")
 
 	return cmd
 }

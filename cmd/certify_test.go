@@ -20,6 +20,7 @@ package cmd
 
 import (
 	"bytes"
+	"encoding/json"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -90,6 +91,39 @@ func TestCertify(t *testing.T) {
 			require.NoError(t, cmd.Execute())
 			require.NotEmpty(t, outBuf.String())
 			require.Equal(t, "<CERTIFICATION OUTPUT>\n", outBuf.String())
+		})
+
+		t.Run("Should display JSON certificate when flag --output and -u and values are given", func(t *testing.T) {
+			cmd := NewCertifyCmd()
+			outBuf := bytes.NewBufferString("")
+			cmd.SetOut(outBuf)
+			errBuf := bytes.NewBufferString("")
+			cmd.SetErr(errBuf)
+
+			cmd.SetArgs([]string{
+				"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.valid.tgz",
+				"--output", "json",
+			})
+			require.NoError(t, cmd.Execute())
+			require.NotEmpty(t, outBuf.String())
+
+			expected := map[string]interface{}{
+				"chart": map[string]interface{}{
+					"name":    "chart",
+					"version": "0.1.0-v3.valid",
+				},
+				"results": map[string]interface{}{
+					"is-helm-v3": map[string]interface{}{
+						"ok":     true,
+						"reason": checks.Helm3Reason,
+					},
+				},
+			}
+
+			b, err := json.Marshal(expected)
+			require.NoError(t, err)
+
+			require.Equal(t, string(b)+"\n", outBuf.String())
 		})
 	})
 }

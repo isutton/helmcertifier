@@ -18,13 +18,15 @@
 
 package helmcertifier
 
+import "strconv"
+
 type chartMetadata struct {
-	Name    string `json:"name"`
-	Version string `json:"version"`
+	Name    string `json:"name" yaml:"name"`
+	Version string `json:"version" yaml:"version"`
 }
 
 type metadata struct {
-	ChartMetadata chartMetadata `json:"chart"`
+	ChartMetadata chartMetadata `json:"chart" yaml:"chart"`
 }
 
 func newMetadata(name, version string) *metadata {
@@ -37,16 +39,16 @@ func newMetadata(name, version string) *metadata {
 }
 
 type certificate struct {
-	Ok             bool           `json:"ok"`
-	Metadata       *metadata      `json:"metadata"`
-	CheckResultMap checkResultMap `json:"results"`
+	Ok             bool           `json:"ok" yaml:"ok"`
+	Metadata       *metadata      `json:"metadata" yaml:"metadata"`
+	CheckResultMap checkResultMap `json:"results" yaml:"results"`
 }
 
 type checkResultMap map[string]checkResult
 
 type checkResult struct {
-	Ok     bool   `json:"ok"`
-	Reason string `json:"reason"`
+	Ok     bool   `json:"ok" yaml:"ok"`
+	Reason string `json:"reason" yaml:"reason"`
 }
 
 func newCertificate(name, version string, ok bool, resultMap checkResultMap) Certificate {

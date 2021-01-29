@@ -22,6 +22,7 @@ import (
 	"encoding/json"
 
 	"github.com/spf13/cobra"
+	"gopkg.in/yaml.v3"
 
 	"helmcertifier/pkg/helmcertifier"
 )
@@ -75,6 +76,14 @@ func NewCertifyCmd() *cobra.Command {
 
 			if outputFormat == "json" {
 				b, err := json.Marshal(result)
+				if err != nil {
+					return err
+				}
+
+				cmd.Println(string(b))
+
+			} else if outputFormat == "yaml" {
+				b, err := yaml.Marshal(result)
 				if err != nil {
 					return err
 				}

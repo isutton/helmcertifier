@@ -25,12 +25,14 @@ import (
 )
 
 const (
-	APIVersion2                = "v2"
-	NotHelm3Reason             = "API version is not V2 used in Helm 3"
-	Helm3Reason                = "API version is V2 used in Helm 3"
-	TestTemplatePrefix         = "templates/tests/"
-	ChartTestFilesExist        = "Chart test files exist"
-	ChartTestFilesDoesNotExist = "Chart test files does not exist"
+	APIVersion2                  = "v2"
+	NotHelm3Reason               = "API version is not V2 used in Helm 3"
+	Helm3Reason                  = "API version is V2 used in Helm 3"
+	TestTemplatePrefix           = "templates/tests/"
+	ChartTestFilesExist          = "Chart test files exist"
+	ChartTestFilesDoesNotExist   = "Chart test files does not exist"
+	ValuesSchemaFileExist        = "Values schema file exist"
+	ValuesSchemaFileDoesNotExist = "Values schema file does not exist"
 	ValuesFileExist            = "Values file exist"
 	ValuesFileDoesNotExist     = "Values file does not exist"
 )
@@ -106,7 +108,19 @@ func ContainsValues(uri string) (Result, error) {
 }
 
 func ContainsValuesSchema(uri string) (Result, error) {
-	return notImplemented()
+	c, err := loadChartFromURI(uri)
+	if err != nil {
+		return Result{}, err
+	}
+
+	r := Result{Reason: ValuesSchemaFileDoesNotExist}
+
+	if len(c.Schema) > 0 {
+		r.Reason = ValuesSchemaFileExist
+		r.Ok = true
+	}
+
+	return r, nil
 }
 
 func KeywordsAreOpenshiftCategories(uri string) (Result, error) {

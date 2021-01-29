@@ -64,5 +64,16 @@ func (c *certificate) IsOk() bool {
 }
 
 func (c *certificate) String() string {
-	return "<CERTIFICATION OUTPUT>"
+	report := "chart: " + c.Metadata.ChartMetadata.Name + "\n" +
+		"version: " + c.Metadata.ChartMetadata.Version + "\n" +
+		"ok: " + strconv.FormatBool(c.Ok) + "\n" +
+		"\n"
+
+	for k, v := range c.CheckResultMap {
+		report += k + ":\n" +
+			"\tok: " + strconv.FormatBool(v.Ok) + "\n" +
+			"\treason: " + v.Reason + "\n"
+	}
+
+	return report
 }

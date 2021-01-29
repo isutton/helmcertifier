@@ -88,10 +88,22 @@ func TestCertify(t *testing.T) {
 			errBuf := bytes.NewBufferString("")
 			cmd.SetErr(errBuf)
 
-			cmd.SetArgs([]string{"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.valid.tgz"})
+			cmd.SetArgs([]string{
+				"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.valid.tgz",
+				"--only", "is-helm-v3", // only consider a single check, perhaps more checks in the future
+			})
 			require.NoError(t, cmd.Execute())
 			require.NotEmpty(t, outBuf.String())
-			require.Equal(t, "<CERTIFICATION OUTPUT>\n", outBuf.String())
+
+			// FIXME: the chart name inside the tarball should correspond to the tarball name
+			expected := "chart: testchart\n" +
+				"version: 1.16.0\n" +
+				"ok: true\n" +
+				"\n" +
+				"is-helm-v3:\n" +
+				"\tok: true\n" +
+				"\treason: " + checks.Helm3Reason + "\n"
+			require.Equal(t, expected, outBuf.String())
 		})
 
 		t.Run("Should display JSON certificate when flag --output and -u and values are given", func(t *testing.T) {

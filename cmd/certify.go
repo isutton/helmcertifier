@@ -90,7 +90,7 @@ func NewCertifyCmd() *cobra.Command {
 
 				cmd.Println(string(b))
 			} else {
-				cmd.Println(result)
+				cmd.Print(result)
 			}
 
 			return nil

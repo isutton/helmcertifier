@@ -102,20 +102,26 @@ func TestCertify(t *testing.T) {
 
 			cmd.SetArgs([]string{
 				"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.valid.tgz",
+				"--only", "is-helm-v3",
 				"--output", "json",
 			})
 			require.NoError(t, cmd.Execute())
 			require.NotEmpty(t, outBuf.String())
 
 			expected := map[string]interface{}{
-				"chart": map[string]interface{}{
-					"name":    "chart",
-					"version": "0.1.0-v3.valid",
-				},
-				"results": map[string]interface{}{
-					"is-helm-v3": map[string]interface{}{
-						"ok":     true,
-						"reason": checks.Helm3Reason,
+				"metadata": map[string]interface{}{
+					"chart": map[string]interface{}{
+						// FIXME: the chart name inside the tarball should correspond to the tarball name
+						//"name":    "chart",
+						//"version": "0.1.0-v3.valid",
+						"name":    "testchart",
+						"version": "1.16.0",
+					},
+					"results": map[string]interface{}{
+						"is-helm-v3": map[string]interface{}{
+							"ok":     true,
+							"reason": checks.Helm3Reason,
+						},
 					},
 				},
 			}

@@ -62,7 +62,7 @@ func (c *certifier) Certify(uri string) (Certificate, error) {
 			if err != nil {
 				return nil, NewCheckErr(err)
 			}
-			_ = result.AddResult(r)
+			_ = result.AddCheckResult(name, r)
 		}
 	}
 

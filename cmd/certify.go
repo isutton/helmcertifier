@@ -19,7 +19,10 @@
 package cmd
 
 import (
+	"encoding/json"
+
 	"github.com/spf13/cobra"
+
 	"helmcertifier/pkg/helmcertifier"
 )
 
@@ -71,7 +74,12 @@ func NewCertifyCmd() *cobra.Command {
 			}
 
 			if outputFormat == "json" {
-				cmd.Println("{}")
+				b, err := json.Marshal(result)
+				if err != nil {
+					return err
+				}
+
+				cmd.Println(string(b))
 			} else {
 				cmd.Println(result)
 			}
@@ -87,7 +95,7 @@ func NewCertifyCmd() *cobra.Command {
 
 	cmd.Flags().StringSliceVarP(&exceptChecks, "except", "e", nil, "all available checks except those informed will be performed")
 
-	cmd.Flags().StringVarP(&outputFormat, "output", "f", "", "")
+	cmd.Flags().StringVarP(&outputFormat, "output", "f", "", "the output format: default, json or yaml")
 
 	return cmd
 }

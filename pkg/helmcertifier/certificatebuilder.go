@@ -27,19 +27,24 @@ import (
 type CertificateBuilder interface {
 	SetChartName(name string) CertificateBuilder
 	SetChartVersion(version string) CertificateBuilder
-	AddResult(result checks.Result) CertificateBuilder
+	AddCheckResult(name string, result checks.Result) CertificateBuilder
 	Build() (Certificate, error)
 }
 
+type CheckResult struct {
+	checks.Result
+	Name string
+}
+
 type certificateBuilder struct {
-	ChartName    string
-	ChartVersion string
-	Results      []checks.Result
+	ChartName      string
+	ChartVersion   string
+	CheckResultMap checkResultMap
 }
 
 func NewCertificateBuilder() CertificateBuilder {
 	return &certificateBuilder{
-		Results: []checks.Result{},
+		CheckResultMap: checkResultMap{},
 	}
 }
 
@@ -53,8 +58,8 @@ func (r *certificateBuilder) SetChartVersion(version string) CertificateBuilder 
 	return r
 }
 
-func (r *certificateBuilder) AddResult(result checks.Result) CertificateBuilder {
-	r.Results = append(r.Results, result)
+func (r *certificateBuilder) AddCheckResult(name string, result checks.Result) CertificateBuilder {
+	r.CheckResultMap[name] = checkResult{Ok: result.Ok, Reason: result.Reason}
 	return r
 }
 
@@ -69,12 +74,12 @@ func (r *certificateBuilder) Build() (Certificate, error) {
 
 	ok := true
 
-	for _, cr := range r.Results {
-		if !cr.Ok {
+	for _, v := range r.CheckResultMap {
+		if !v.Ok {
 			ok = false
 			break
 		}
 	}
 
-	return newCertificate(r.ChartName, r.ChartVersion, ok), nil
+	return newCertificate(r.ChartName, r.ChartVersion, ok, r.CheckResultMap), nil
 }

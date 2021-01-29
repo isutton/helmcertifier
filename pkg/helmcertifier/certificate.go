@@ -18,17 +18,21 @@
 
 package helmcertifier
 
+import (
+	"encoding/json"
+)
+
 type chartMetadata struct {
 	Name    string
 	Version string
 }
 
-type certificateMetadata struct {
+type metadata struct {
 	ChartMetadata chartMetadata
 }
 
-func newCertificateMetadata(name, version string) *certificateMetadata {
-	return &certificateMetadata{
+func newMetadata(name, version string) *metadata {
+	return &metadata{
 		ChartMetadata: chartMetadata{
 			Name:    name,
 			Version: version,
@@ -37,21 +41,43 @@ func newCertificateMetadata(name, version string) *certificateMetadata {
 }
 
 type certificate struct {
-	CertificateMetadata *certificateMetadata
-	Ok                  bool
+	Ok             bool
+	Metadata       *metadata
+	CheckResultMap checkResultMap
 }
 
-func newCertificate(name, version string, ok bool) Certificate {
+type checkResultMap map[string]checkResult
+
+type checkResult struct {
+	Ok     bool   `json:"ok"`
+	Reason string `json:"reason"`
+}
+
+func (c *certificate) MarshalJSON() ([]byte, error) {
+	m := map[string]interface{}{
+		"metadata": map[string]interface{}{
+			"chart": map[string]interface{}{
+				"name":    c.Metadata.ChartMetadata.Name,
+				"version": c.Metadata.ChartMetadata.Version,
+			},
+			"results": c.CheckResultMap,
+		},
+	}
+	return json.Marshal(m)
+}
+
+func newCertificate(name, version string, ok bool, resultMap checkResultMap) Certificate {
 	return &certificate{
-		CertificateMetadata: newCertificateMetadata(name, version),
-		Ok:                  ok,
+		Metadata:       newMetadata(name, version),
+		Ok:             ok,
+		CheckResultMap: resultMap,
 	}
 }
 
-func (r *certificate) IsOk() bool {
-	return r.Ok
+func (c *certificate) IsOk() bool {
+	return c.Ok
 }
 
-func (r *certificate) String() string {
+func (c *certificate) String() string {
 	return "<CERTIFICATION OUTPUT>"
 }

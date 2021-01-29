@@ -102,11 +102,16 @@ func TestCertify(t *testing.T) {
 
 			cmd.SetArgs([]string{
 				"-u", "../pkg/helmcertifier/checks/chart-0.1.0-v3.valid.tgz",
-				"--only", "is-helm-v3",
+				"--only", "is-helm-v3", // only consider a single check, perhaps more next
 				"--output", "json",
 			})
 			require.NoError(t, cmd.Execute())
 			require.NotEmpty(t, outBuf.String())
+
+			// attempts to deserialize the command's output, expecting a json string
+			actual := map[string]interface{}{}
+			err := json.Unmarshal([]byte(outBuf.String()), &actual)
+			require.NoError(t, err)
 
 			expected := map[string]interface{}{
 				"metadata": map[string]interface{}{
@@ -114,22 +119,19 @@ func TestCertify(t *testing.T) {
 						// FIXME: the chart name inside the tarball should correspond to the tarball name
 						//"name":    "chart",
 						//"version": "0.1.0-v3.valid",
-						"name":    "testchart",
-						"version": "1.16.0",
+						"name":    "testchart", // should be "chart"
+						"version": "1.16.0",    // should be "0.1.0-v3.valid"
 					},
-					"results": map[string]interface{}{
-						"is-helm-v3": map[string]interface{}{
-							"ok":     true,
-							"reason": checks.Helm3Reason,
-						},
+				},
+				"ok": true,
+				"results": map[string]interface{}{
+					"is-helm-v3": map[string]interface{}{
+						"ok":     true,
+						"reason": checks.Helm3Reason,
 					},
 				},
 			}
-
-			b, err := json.Marshal(expected)
-			require.NoError(t, err)
-
-			require.Equal(t, string(b)+"\n", outBuf.String())
+			require.Equal(t, expected, actual)
 		})
 	})
 }

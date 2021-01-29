@@ -18,17 +18,13 @@
 
 package helmcertifier
 
-import (
-	"encoding/json"
-)
-
 type chartMetadata struct {
-	Name    string
-	Version string
+	Name    string `json:"name"`
+	Version string `json:"version"`
 }
 
 type metadata struct {
-	ChartMetadata chartMetadata
+	ChartMetadata chartMetadata `json:"chart"`
 }
 
 func newMetadata(name, version string) *metadata {
@@ -41,9 +37,9 @@ func newMetadata(name, version string) *metadata {
 }
 
 type certificate struct {
-	Ok             bool
-	Metadata       *metadata
-	CheckResultMap checkResultMap
+	Ok             bool           `json:"ok"`
+	Metadata       *metadata      `json:"metadata"`
+	CheckResultMap checkResultMap `json:"results"`
 }
 
 type checkResultMap map[string]checkResult
@@ -51,19 +47,6 @@ type checkResultMap map[string]checkResult
 type checkResult struct {
 	Ok     bool   `json:"ok"`
 	Reason string `json:"reason"`
-}
-
-func (c *certificate) MarshalJSON() ([]byte, error) {
-	m := map[string]interface{}{
-		"metadata": map[string]interface{}{
-			"chart": map[string]interface{}{
-				"name":    c.Metadata.ChartMetadata.Name,
-				"version": c.Metadata.ChartMetadata.Version,
-			},
-			"results": c.CheckResultMap,
-		},
-	}
-	return json.Marshal(m)
 }
 
 func newCertificate(name, version string, ok bool, resultMap checkResultMap) Certificate {

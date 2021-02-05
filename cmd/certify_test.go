@@ -95,8 +95,7 @@ func TestCertify(t *testing.T) {
 			require.NoError(t, cmd.Execute())
 			require.NotEmpty(t, outBuf.String())
 
-			// FIXME: the chart name inside the tarball should correspond to the tarball name
-			expected := "chart: testchart\n" +
+			expected := "chart: chart\n" +
 				"version: 1.16.0\n" +
 				"ok: true\n" +
 				"\n" +
@@ -129,11 +128,8 @@ func TestCertify(t *testing.T) {
 			expected := map[string]interface{}{
 				"metadata": map[string]interface{}{
 					"chart": map[string]interface{}{
-						// FIXME: the chart name inside the tarball should correspond to the tarball name
-						//"name":    "chart",
-						//"version": "0.1.0-v3.valid",
-						"name":    "testchart", // should be "chart"
-						"version": "1.16.0",    // should be "0.1.0-v3.valid"
+						"name":    "chart",
+						"version": "1.16.0",
 					},
 				},
 				"ok": true,
@@ -170,11 +166,8 @@ func TestCertify(t *testing.T) {
 			expected := map[string]interface{}{
 				"metadata": map[string]interface{}{
 					"chart": map[string]interface{}{
-						// FIXME: the chart name inside the tarball should correspond to the tarball name
-						//"name":    "chart",
-						//"version": "0.1.0-v3.valid",
-						"name":    "testchart", // should be "chart"
-						"version": "1.16.0",    // should be "0.1.0-v3.valid"
+						"name":    "chart",
+						"version": "1.16.0",
 					},
 				},
 				"ok": true,

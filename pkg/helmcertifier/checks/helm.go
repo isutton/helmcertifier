@@ -75,22 +75,22 @@ func loadChartFromAbsPath(path string) (*chart.Chart, error) {
 
 type ChartCache interface {
 	MakeKey(uri string) string
-	Add(uri string, chrt *chart.Chart) error
+	Add(uri string, chrt *chart.Chart) (ChartCacheItem, error)
 	Get(uri string) (*chart.Chart, bool, error)
 }
 
-type chartCacheItem struct {
+type ChartCacheItem struct {
 	Chart *chart.Chart
 	Path  string
 }
 
 type chartCache struct {
-	chartMap map[string]chartCacheItem
+	chartMap map[string]ChartCacheItem
 }
 
 func newChartCache() *chartCache {
 	return &chartCache{
-		chartMap: make(map[string]chartCacheItem),
+		chartMap: make(map[string]ChartCacheItem),
 	}
 }
 
@@ -106,19 +106,17 @@ func (c *chartCache) Get(uri string) (*chart.Chart, bool, error) {
 	}
 }
 
-func (c *chartCache) Add(uri string, chrt *chart.Chart) error {
+func (c *chartCache) Add(uri string, chrt *chart.Chart) (ChartCacheItem, error) {
 	userCacheDir, err := os.UserCacheDir()
 	if err != nil {
-		return err
+		return ChartCacheItem{}, err
 	}
 	key := c.MakeKey(uri)
 	cacheDir := path.Join(userCacheDir, "helmcertifier")
 	chartCacheDir := path.Join(cacheDir, key)
-	c.chartMap[key] = chartCacheItem{
-		Chart: chrt,
-		Path:  chartCacheDir,
-	}
-	return nil
+	cacheItem := ChartCacheItem{Chart: chrt, Path: chartCacheDir}
+	c.chartMap[key] = cacheItem
+	return cacheItem, nil
 }
 
 var defaultChartCache *chartCache
@@ -129,19 +127,19 @@ func init() {
 
 // LoadChartFromURI attempts to retrieve a chart from the given uri string. It accepts "http", "https", "file" schemes,
 // and defaults to "file" if there isn't one.
-func LoadChartFromURI(uri string) (*chart.Chart, error) {
+func LoadChartFromURI(uri string) (*chart.Chart, string, error) {
 	var (
 		chrt *chart.Chart
 		err  error
 	)
 
 	if chrt, ok, _ := defaultChartCache.Get(uri); ok {
-		return chrt, nil
+		return chrt, "", nil
 	}
 
 	u, err := url.Parse(uri)
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
 	switch u.Scheme {
@@ -150,18 +148,18 @@ func LoadChartFromURI(uri string) (*chart.Chart, error) {
 	case "file", "":
 		chrt, err = loadChartFromAbsPath(u.Path)
 	default:
-		return nil, errors.Errorf("scheme %q not supported", u.Scheme)
+		return nil, "", errors.Errorf("scheme %q not supported", u.Scheme)
 	}
 
 	if err != nil {
-		return nil, err
+		return nil, "", err
 	}
 
-	if err = defaultChartCache.Add(uri, chrt); err != nil {
-		return nil, err
+	if cached, err := defaultChartCache.Add(uri, chrt); err != nil {
+		return nil, "", err
+	} else {
+		return cached.Chart, cached.Path, nil
 	}
-
-	return chrt, nil
 }
 
 type ChartNotFoundErr string

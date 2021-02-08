@@ -62,7 +62,7 @@ func TestLoadChartFromURI(t *testing.T) {
 
 	for _, tc := range positiveCases {
 		t.Run(tc.description, func(t *testing.T) {
-			c, err := LoadChartFromURI(tc.uri)
+			c, _, err := LoadChartFromURI(tc.uri)
 			require.NoError(t, err)
 			require.NotNil(t, c)
 		})
@@ -70,7 +70,7 @@ func TestLoadChartFromURI(t *testing.T) {
 
 	for _, tc := range negativeCases {
 		t.Run(tc.description, func(t *testing.T) {
-			c, err := LoadChartFromURI(tc.uri)
+			c, _, err := LoadChartFromURI(tc.uri)
 			require.Error(t, err)
 			require.True(t, IsChartNotFound(err))
 			require.Equal(t, "chart not found: "+tc.uri, err.Error())

@@ -45,7 +45,7 @@ type certifier struct {
 
 func (c *certifier) Certify(uri string) (Certificate, error) {
 
-	chrt, err := checks.LoadChartFromURI(uri)
+	chrt, _, err := checks.LoadChartFromURI(uri)
 	if err != nil {
 		return nil, err
 	}

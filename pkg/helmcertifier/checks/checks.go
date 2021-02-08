@@ -48,7 +48,7 @@ func notImplemented() (Result, error) {
 }
 
 func IsHelmV3(uri string) (Result, error) {
-	c, err := LoadChartFromURI(uri)
+	c, _, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}
@@ -62,7 +62,7 @@ func IsHelmV3(uri string) (Result, error) {
 }
 
 func HasReadme(uri string) (Result, error) {
-	c, err := LoadChartFromURI(uri)
+	c, _, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}
@@ -79,7 +79,7 @@ func HasReadme(uri string) (Result, error) {
 }
 
 func ContainsTest(uri string) (Result, error) {
-	c, err := LoadChartFromURI(uri)
+	c, _, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}
@@ -98,7 +98,7 @@ func ContainsTest(uri string) (Result, error) {
 }
 
 func ContainsValues(uri string) (Result, error) {
-	c, err := LoadChartFromURI(uri)
+	c, _, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}
@@ -114,7 +114,7 @@ func ContainsValues(uri string) (Result, error) {
 }
 
 func ContainsValuesSchema(uri string) (Result, error) {
-	c, err := LoadChartFromURI(uri)
+	c, _, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}
@@ -142,7 +142,7 @@ func IsCommunityChart(uri string) (Result, error) {
 }
 
 func HasMinKubeVersion(uri string) (Result, error) {
-	c, err := LoadChartFromURI(uri)
+	c, _, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}
@@ -158,7 +158,7 @@ func HasMinKubeVersion(uri string) (Result, error) {
 }
 
 func NotContainCRDs(uri string) (Result, error) {
-	c, err := LoadChartFromURI(uri)
+	c, _, err := LoadChartFromURI(uri)
 	if err != nil {
 		return Result{}, err
 	}

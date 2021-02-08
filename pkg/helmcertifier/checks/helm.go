@@ -75,7 +75,7 @@ func loadChartFromAbsPath(path string) (*chart.Chart, error) {
 type ChartCache interface {
 	MakeKey(uri string) string
 	Add(uri string, chrt *chart.Chart) (ChartCacheItem, error)
-	Get(uri string) (*chart.Chart, bool, error)
+	Get(uri string) (ChartCacheItem, bool, error)
 }
 
 type ChartCacheItem struct {
@@ -97,11 +97,11 @@ func (c *chartCache) MakeKey(uri string) string {
 	return regexp.MustCompile("[:/?.-]").ReplaceAllString(uri, "_")
 }
 
-func (c *chartCache) Get(uri string) (*chart.Chart, bool, error) {
-	if chrt, ok := c.chartMap[c.MakeKey(uri)]; !ok {
-		return nil, false, nil
+func (c *chartCache) Get(uri string) (ChartCacheItem, bool, error) {
+	if item, ok := c.chartMap[c.MakeKey(uri)]; !ok {
+		return ChartCacheItem{}, false, nil
 	} else {
-		return chrt.Chart, true, nil
+		return item, true, nil
 	}
 }
 
@@ -135,8 +135,8 @@ func LoadChartFromURI(uri string) (*chart.Chart, string, error) {
 		err  error
 	)
 
-	if chrt, ok, _ := defaultChartCache.Get(uri); ok {
-		return chrt, "", nil
+	if cached, ok, _ := defaultChartCache.Get(uri); ok {
+		return cached.Chart, cached.Path, nil
 	}
 
 	u, err := url.Parse(uri)
